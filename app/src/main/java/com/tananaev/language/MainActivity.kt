@@ -33,7 +33,10 @@ class MainActivity : AppCompatActivity() {
             updateView(data[Random.nextInt(0, data.size)])
         }
 
-        setRepeatedAlarm()
+        if (PendingIntent.getActivity(
+                this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_NO_CREATE) == null) {
+            setRepeatedAlarm()
+        }
     }
 
     override fun onResume() {
