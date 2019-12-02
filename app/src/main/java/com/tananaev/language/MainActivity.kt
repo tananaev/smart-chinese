@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private fun setRepeatedAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 5000, ALARM_TAG, {
+        alarmManager.set(AlarmManager.RTC, AlarmScheduler.nextAlarmTime(), ALARM_TAG, {
             showNotification()
             setRepeatedAlarm()
         }, null)
