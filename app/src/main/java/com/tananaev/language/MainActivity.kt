@@ -1,8 +1,6 @@
 package com.tananaev.language
 
 import android.app.AlarmManager
-import android.app.Application
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -10,15 +8,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        const val ALARM_TAG = "alarm"
-        const val NOTIFICATION_ID = 1
-    }
 
     private lateinit var data: List<Word>
 
@@ -33,8 +25,7 @@ class MainActivity : AppCompatActivity() {
             updateView(data[Random.nextInt(0, data.size)])
         }
 
-        if (PendingIntent.getActivity(
-                this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_NO_CREATE) == null) {
+        if (PendingIntent.getBroadcast(this, 0, alarmIntent(), PendingIntent.FLAG_NO_CREATE) == null) {
             setRepeatedAlarm()
         }
     }
@@ -51,27 +42,17 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.english).text = word.english
     }
 
+    private fun alarmIntent(): Intent {
+        val intent = Intent(this.javaClass.name.replace("MainActivity", "NOTIFICATION"))
+        intent.setClass(this, AlarmReceiver::class.java)
+        return intent
+    }
+
     private fun setRepeatedAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        alarmManager.set(AlarmManager.RTC, AlarmScheduler.nextAlarmTime(), ALARM_TAG, {
-            showNotification()
-            setRepeatedAlarm()
-        }, null)
-    }
-
-    private fun showNotification() {
-        val intent = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), 0)
-
-        val notification = NotificationCompat.Builder(this, MainApplication.CHANNEL_DEFAULT)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentText(getString(R.string.notification))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(intent)
-            .setAutoCancel(true)
-            .build()
-
-        val notificationManager = getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        val intent = PendingIntent.getBroadcast(this, 0, alarmIntent(), 0)
+        alarmManager.setRepeating(
+            AlarmManager.RTC, AlarmScheduler.nextAlarmTime(), AlarmManager.INTERVAL_HOUR, intent)
     }
 }

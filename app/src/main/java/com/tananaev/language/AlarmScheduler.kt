@@ -7,6 +7,13 @@ object AlarmScheduler {
     private const val hourFrom = 8
     private const val hourTo = 22
 
+    fun checkTime(): Boolean {
+
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        return hour in hourFrom..hourTo
+    }
+
     fun nextAlarmTime(): Long {
 
         val calendar = Calendar.getInstance()
